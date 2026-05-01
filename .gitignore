@@ -1,0 +1,27 @@
+﻿# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+
+# Backup files
+*.backup.html
+index.backup.html
+
+# Old versions
+tmv1.html
+
+# Debug artifacts
+powershell_output.txt
+*.log
+*.tmp
+
+# Unrelated content
+\# AI CMO Platform Complete Blueprin.txt
+social_agent.py
+
+# Oversized favicon
+Favicon_tm_blk_large.png

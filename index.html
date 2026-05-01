@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Token Moon v4.8 — AI Cost Intelligence Platform</title>
+</head>
+<body style="margin:0;padding:16px;background:#0f1117;min-height:100vh">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1117;--sur:#171b26;--sur2:#1e2333;--bor:#2a3048;--amb:#f59e0b;--txt:#e8eaf0;--mut:#9ca3af;--grn:#10b981;--red:#ef4444;--blu:#3b82f6;--pur:#a78bfa;--teal:#14b8a6}
+.w{font-family:ui-monospace,'DM Mono',monospace;background:var(--bg);color:var(--txt);padding:16px;border-radius:12px;min-height:560px}
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--bor);flex-wrap:wrap;gap:10px}
+.logo{display:flex;align-items:center;gap:10px}
+.ld{width:30px;height:30px;background:var(--amb);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#000;flex-shrink:0}
+.lt{font-size:16px;font-weight:600;color:var(--txt)}
+.vtag{font-size:9px;background:rgba(245,158,11,.2);color:var(--amb);padding:2px 6px;border-radius:3px;margin-left:6px}
+.ls{font-size:10px;color:var(--mut);letter-spacing:.8px;text-transform:uppercase}
+.panel{display:none}.panel.on{display:block}
+.pill{display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;letter-spacing:.3px}
+.p-est{background:rgba(245,158,11,.2);color:var(--amb)}
+.p-cal{background:rgba(59,130,246,.2);color:var(--blu)}
+.p-ver{background:rgba(16,185,129,.2);color:var(--grn)}
+.p-oai{background:rgba(59,130,246,.15);color:#93c5fd;border:1px solid rgba(59,130,246,.3)}
+.p-ant{background:rgba(245,158,11,.12);color:var(--amb);border:1px solid rgba(245,158,11,.2)}
+.p-llm{background:rgba(59,130,246,.15);color:#93c5fd}
+.p-tool{background:rgba(156,163,175,.15);color:var(--mut)}
+.loop-badge{font-size:10px;color:var(--pur);background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.25);border-radius:3px;padding:1px 6px;margin-left:5px}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.metrics-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.met{background:var(--sur);border:1px solid var(--bor);border-radius:7px;padding:11px}
+.met-l{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.met-v{font-size:19px;font-weight:600;color:var(--txt)}.met-v.a{color:var(--amb)}.met-v.g{color:var(--grn)}.met-v.b{color:var(--blu)}.met-v.p{color:var(--pur)}
+.tbl{width:100%;border-collapse:collapse;font-size:11px}
+.tbl th{text-align:left;padding:7px 8px;color:var(--mut);font-size:10px;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--bor);font-weight:500}
+.tbl td{padding:7px 8px;border-bottom:1px solid rgba(42,48,72,.45);vertical-align:middle}
+.tbl tr:hover td{background:rgba(255,255,255,.018)}
+.scroll{max-height:260px;overflow-y:auto}
+.scroll::-webkit-scrollbar{width:3px}
+.scroll::-webkit-scrollbar-thumb{background:var(--bor);border-radius:2px}
+.divider{border:none;border-top:1px solid var(--bor);margin:14px 0}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;font-weight:500}
+.field input,.field select,.field textarea{background:var(--sur2);border:1px solid var(--bor);border-radius:5px;padding:7px 9px;font-size:11px;color:var(--txt);font-family:inherit;outline:none;width:100%}
+.field select option{background:var(--sur2)}
+.field textarea{resize:vertical;line-height:1.4}
+.field textarea::placeholder{color:var(--mut)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.paste-box{background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:13px;margin-bottom:10px}
+.paste-l{font-size:11px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.sec-t{font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px;font-weight:500;margin-top:4px}
+.insight{background:var(--sur);border:1px solid var(--bor);border-radius:7px;padding:11px;margin-bottom:8px;display:flex;gap:10px}
+.ins-d{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.ins-l{font-size:10px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;font-weight:600}
+.ins-t{font-size:11px;color:var(--txt);line-height:1.5}
+.ins-s{font-size:10px;color:var(--grn);margin-top:3px}
+.how-to{background:var(--sur);border:1px solid var(--bor);border-radius:7px;padding:8px 12px;font-size:11px;color:var(--mut);line-height:1.8;margin-bottom:10px}
+.wf-n{font-size:12px;font-weight:600;color:var(--amb);padding:6px 11px;background:rgba(245,158,11,.08);border-radius:5px;border-left:2px solid var(--amb);margin-bottom:12px}
+.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:9px 12px;font-size:11px;color:var(--red);margin-bottom:10px}
+.conf-bar{display:flex;align-items:center;gap:10px;background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:9px 13px;margin-bottom:12px;flex-wrap:wrap}
+.cache-box{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);border-radius:7px;padding:11px 13px;margin-bottom:12px}
+.cache-t{font-size:10px;color:var(--pur);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600}
+.mtog{display:flex;gap:2px;background:var(--sur2);padding:2px;border-radius:5px;border:1px solid var(--bor)}
+.mb{padding:2px 6px;border-radius:3px;font-size:10px;font-weight:500;cursor:pointer;border:none;background:transparent;font-family:inherit;color:var(--mut)}
+.plan-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.plan-card{background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:13px;text-align:center}
+.plan-card.recommended{border-color:var(--teal);background:rgba(20,184,166,.06)}
+.plan-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.plan-price{font-size:18px;font-weight:700;color:var(--amb);margin-bottom:6px}
+.plan-badge{font-size:10px;background:rgba(20,184,166,.2);color:var(--teal);padding:2px 8px;border-radius:3px;display:inline-block;margin-bottom:8px}
+.plan-feat{font-size:10px;color:var(--mut);line-height:1.7;text-align:left}
+.plan-feat li{list-style:none;padding-left:12px;position:relative}
+.plan-feat li::before{content:'·';position:absolute;left:2px}
+input[type=range]{width:100%;accent-color:var(--grn)}
+input[type=number]{background:var(--sur2);border:1px solid var(--bor);border-radius:4px;padding:2px 5px;font-size:11px;color:var(--txt);font-family:inherit;outline:none;width:64px}
+/* Optimize panel */
+.opt-rec{background:var(--sur);border:1px solid var(--bor);border-radius:8px;padding:13px;margin-bottom:10px}
+.opt-rec-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.opt-cat{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 7px;border-radius:3px}
+.opt-saving{font-size:10px;color:var(--grn);margin-top:5px;font-weight:600}
+.opt-how{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:5px;padding:8px 10px;font-size:10px;color:var(--mut);margin-top:7px;line-height:1.6}
+.opt-how strong{color:var(--grn)}
+/* Tooltip system */
+.ti{position:relative;display:inline-flex;align-items:center;gap:5px}
+.ti-i{width:15px;height:15px;border-radius:50%;background:rgba(156,163,175,.15);border:1px solid rgba(156,163,175,.3);display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#9ca3af;cursor:default;font-style:italic;font-family:Georgia,serif;user-select:none;flex-shrink:0}
+.ti-i:hover,.ti-i:focus{background:rgba(16,185,129,.2);border-color:rgba(16,185,129,.5);color:#10b981;outline:none}
+.ti-box{display:none;position:absolute;left:20px;top:50%;transform:translateY(-50%);z-index:9999;background:#1a2235;border:1px solid #3a4560;border-radius:8px;padding:11px 13px;font-size:11px;color:#e8eaf0;line-height:1.6;width:260px;box-shadow:0 10px 30px rgba(0,0,0,.6);pointer-events:none}
+.ti-i:hover+.ti-box,.ti-i:focus+.ti-box{display:block}
+.tt{font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;display:block}
+/* pricing timestamp */
+.price-ts{font-size:9px;color:rgba(156,163,175,.5);margin-left:8px;font-style:italic}
+</style>
+
+<div class="w">
+<div class="hdr">
+  <div class="logo">
+    <div class="ld">TM</div>
+    <div>
+      <div style="display:flex;align-items:center"><span class="lt">Token Moon</span><span class="vtag">v4.8</span></div>
+      <div class="ls">AI Cost Intelligence Platform</div>
+    </div>
+  </div>
+  <div style="font-size:10px;color:var(--mut);text-align:right">Select a mode to estimate costs<br>for any LLM usage pattern</div>
+</div>
+
+<!-- MODE BAR -->
+<div style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+  <button id="mbtn-n8n" onclick="switchMode('n8n')" style="flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">
+    <span>⚙</span><span><span style="display:block;font-size:12px">n8n Workflows</span><span style="font-size:9px;opacity:.7;font-weight:400">Parse workflow JSON</span></span>
+  </button>
+  <button id="mbtn-api" onclick="switchMode('api')" style="flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(16,185,129,.2);color:#6ee7b7;border:2px solid rgba(16,185,129,.5)">
+    <span>⬡</span><span><span style="display:block;font-size:12px">API Calls</span><span style="font-size:9px;opacity:.7;font-weight:400">Direct LLM API usage</span></span>
+  </button>
+  <button id="mbtn-code" onclick="switchMode('code')" style="flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(16,185,129,.2);color:#6ee7b7;border:2px solid rgba(16,185,129,.5)">
+    <span>◈</span><span><span style="display:block;font-size:12px">Claude Code</span><span style="font-size:9px;opacity:.7;font-weight:400">Agentic session cost</span></span>
+  </button>
+  <button id="mbtn-plan" onclick="switchMode('plan')" style="flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(16,185,129,.2);color:#6ee7b7;border:2px solid rgba(16,185,129,.5)">
+    <span>◎</span><span><span style="display:block;font-size:12px">Plan Advisor</span><span style="font-size:9px;opacity:.7;font-weight:400">Which tier do you need</span></span>
+  </button>
+</div>
+
+<!-- N8N MODE -->
+<div id="mode-n8n" class="panel on">
+  <div class="how-to"><strong style="color:var(--txt)">How to import:</strong> In n8n open your workflow → three-dot menu → Download → open the .json in any text editor → Select All → Copy → paste below.</div>
+
+  <!-- Workflow-level call volume -->
+  <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:7px;padding:10px 13px;margin-bottom:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span class="ti">
+      <span style="font-size:11px;color:var(--txt);font-weight:600">Workflow runs/month</span>
+      <span class="ti-i" tabindex="0">i</span>
+      <span class="ti-box"><span class="tt">Workflow Volume</span>How many times this entire workflow executes per month. Cascades to all nodes. Loop nodes multiply by their batch size automatically.</span>
+    </span>
+    <input type="number" id="wf-runs" value="30" min="1" style="width:70px" onchange="applyWfRuns()">
+    <span style="font-size:10px;color:var(--mut)">Applied to all nodes on parse. Loop nodes multiply automatically.</span>
+  </div>
+
+  <div class="paste-box">
+    <div class="paste-l">
+      <span class="ti">
+        <span style="color:var(--txt);font-weight:600">Paste workflow JSON</span>
+        <span class="ti-i" tabindex="0">i</span>
+        <span class="ti-box"><span class="tt">Workflow JSON</span>Export from n8n: open workflow → ⋯ menu → Download. Open the .json in any text editor, select all, copy, paste here.</span>
+      </span>
+      <span style="color:var(--mut);font-size:10px">n8n export</span>
+    </div>
+    <textarea style="background:var(--sur2);border:1px solid var(--bor);border-radius:5px;padding:9px;font-size:11px;color:var(--txt);font-family:inherit;width:100%;resize:vertical;outline:none;line-height:1.4;min-height:80px" id="wf-paste" placeholder="Paste full n8n workflow JSON here..."></textarea>
+    <div style="display:flex;gap:8px;margin-top:9px;align-items:center;flex-wrap:wrap">
+      <button onclick="parseWF()" style="padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">Parse workflow</button>
+      <button id="wiz-btn" onclick="openWizard()" style="display:none;padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">Setup Wizard</button>
+      <button id="opt-btn" onclick="openOptimize()" style="display:none;padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">⚡ Optimize Workflow</button>
+      <button onclick="clearWF()" style="padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(16,185,129,.2);color:#6ee7b7;border:2px solid rgba(16,185,129,.5)">Clear</button>
+      <span id="parse-status" style="font-size:11px;color:var(--grn)"></span>
+    </div>
+  </div>
+
+  <div class="paste-box" style="border-color:rgba(16,185,129,.5)">
+    <div class="paste-l">
+      <span class="ti">
+        <span style="color:var(--grn);font-weight:600">Paste execution log JSON</span>
+        <span class="ti-i" tabindex="0">i</span>
+        <span class="ti-box"><span class="tt">Execution Log (VER)</span>Post-build only. In n8n: Executions → click a completed run → ⋯ menu → Download. Upgrades EST nodes to VER accuracy using real token data.</span>
+      </span>
+      <span style="color:var(--mut);font-size:10px">optional — upgrades to VER</span>
+    </div>
+    <textarea style="background:var(--sur2);border:1px solid var(--bor);border-radius:5px;padding:9px;font-size:11px;color:var(--txt);font-family:inherit;width:100%;resize:vertical;outline:none;line-height:1.4;min-height:60px" id="ex-paste" placeholder="Paste n8n execution log JSON to upgrade EST nodes to VER..."></textarea>
+    <div style="display:flex;gap:8px;margin-top:9px">
+      <button onclick="applyExLog()" style="padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">Apply execution log</button>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px;flex-wrap:wrap">
+    <span class="ti">
+      <span style="font-size:11px;color:var(--mut)">Try a demo:</span>
+      <span class="ti-i" tabindex="0">i</span>
+      <span class="ti-box"><span class="tt">Demo Workflows</span>Pre-loaded real-world workflow examples. AEO/GEO Agent is validated against actual n8n execution data (±14% EST accuracy).</span>
+    </span>
+    <button onclick="loadDemo('aeo')" style="padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">AEO/GEO Agent</button>
+    <button onclick="loadDemo('yurts')" style="padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">Yurts 7-Agent</button>
+    <button onclick="loadDemo('saas')" style="padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">B2B SaaS</button>
+  </div>
+
+  <div id="n8n-err" style="display:none" class="err"></div>
+
+  <div id="n8n-results" style="display:none">
+    <div id="wf-name-bar"></div>
+    <div id="conf-bar" class="conf-bar"></div>
+    <div id="cache-alert" class="cache-box" style="display:none"></div>
+    <div id="n8n-metrics" class="metrics"></div>
+    <div style="background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:8px 12px;font-size:11px;color:var(--mut);margin-bottom:12px;line-height:1.5">
+      Nodes marked <span class="pill p-est">EST</span> have dynamic payloads. Click <strong style="color:#6ee7b7">Setup Wizard</strong> for guided calibration or <strong style="color:#6ee7b7">Calibrate</strong> per node.
+    </div>
+    <div class="scroll">
+      <span class="ti" style="margin-bottom:7px;display:inline-flex">
+        <span style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:500">Node table</span>
+        <span class="ti-i" tabindex="0">i</span>
+        <span class="ti-box"><span class="tt">Node Table</span>LLM nodes show token estimates and monthly cost. Out tok defaults to ~297 tokens — calibrate with a real output sample for accuracy. Calls/mo is editable per node.</span>
+      </span>
+      <table class="tbl">
+        <thead><tr><th>Node</th><th>Type</th><th>Provider</th><th>Model</th><th>Acc.</th><th>In tok</th><th>Out tok</th><th>Calls/mo</th><th>Monthly</th><th></th></tr></thead>
+        <tbody id="n8n-tbody"></tbody>
+      </table>
+    </div>
+    <div id="cal-panels"></div>
+    <div class="divider"></div>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="switchN8nTab('compare')" style="padding:8px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">Model Compare</button>
+        <button onclick="switchN8nTab('insights')" style="padding:8px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">Insights</button>
+        <button onclick="switchN8nTab('cache')" style="padding:8px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">Caching</button>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:var(--mut)">Estimated monthly</div>
+        <div style="font-size:22px;font-weight:700;color:var(--amb)" id="n8n-total">$0.00</div>
+        <div style="font-size:10px;color:var(--mut)" id="n8n-conf"></div>
+      </div>
+    </div>
+    <div id="n8n-sub" style="display:none;margin-top:14px"></div>
+  </div>
+
+  <!-- Setup Wizard panel -->
+  <div id="wiz-panel" style="display:none;margin-top:10px">
+    <div style="background:var(--sur);border:1px solid var(--bor);border-radius:10px;padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span class="ti">
+          <span style="font-size:12px;font-weight:600;color:var(--txt)">Setup Wizard</span>
+          <span class="ti-i" tabindex="0">i</span>
+          <span class="ti-box"><span class="tt">Setup Wizard</span>Guided calibration for each LLM node. Paste real input and output samples to upgrade from EST to CAL accuracy — typically within 5% of actual cost.</span>
+        </span>
+        <button onclick="closeWizard()" style="padding:5px 12px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(16,185,129,.2);color:#6ee7b7;border:2px solid rgba(16,185,129,.5)">Close</button>
+      </div>
+      <div id="wiz-prog" style="display:flex;align-items:center;gap:6px;margin-bottom:14px"></div>
+      <div id="wiz-body"></div>
+      <div style="display:flex;gap:8px;margin-top:12px" id="wiz-nav"></div>
+    </div>
+  </div>
+
+  <!-- Optimize Workflow panel -->
+  <div id="opt-panel" style="display:none;margin-top:10px">
+    <div style="background:var(--sur);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span class="ti">
+          <span style="font-size:12px;font-weight:600;color:var(--amb)">⚡ Optimize Workflow</span>
+          <span class="ti-i" tabindex="0">i</span>
+          <span class="ti-box"><span class="tt">Optimize Workflow</span>Audits your parsed workflow against a rulebook. Flags cost, reliability, and architecture issues with specific How-to-fix steps for n8n.</span>
+        </span>
+        <button onclick="closeOptimize()" style="padding:5px 12px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(16,185,129,.2);color:#6ee7b7;border:2px solid rgba(16,185,129,.5)">Close</button>
+      </div>
+      <div id="opt-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- API CALLS MODE -->
+<div id="mode-api" class="panel">
+  <div style="font-size:11px;color:var(--mut);margin-bottom:14px;line-height:1.6;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);border-radius:7px;padding:9px 13px">Estimate the cost of any direct LLM API call — from Python, JavaScript, curl, LangChain, or any framework that calls an LLM API directly.</div>
+  <div class="grid2">
+    <div class="field">
+      <label><span class="ti"><span>Provider</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Provider</span>Anthropic or OpenAI. Selecting a provider updates the model list below.</span></span></label>
+      <select id="api-provider" onchange="updateApiModels()"><option value="ant">Anthropic</option><option value="oai">OpenAI</option></select>
+    </div>
+    <div class="field">
+      <label><span class="ti"><span>Model</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Model</span>All models across both providers are compared in the table below. Select your primary model here.<span class="price-ts">Pricing verified Apr 2025</span></span></span></label>
+      <select id="api-model"></select>
+    </div>
+  </div>
+  <div class="grid3">
+    <div class="field">
+      <label><span class="ti"><span>System prompt (words)</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">System Prompt</span>Sent on every call. Paste exact text below for precise token count, or enter estimated word count here.</span></span></label>
+      <input type="number" id="api-sys" value="150" min="0" onchange="calcAPI()">
+    </div>
+    <div class="field">
+      <label><span class="ti"><span>Avg user input (words)</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">User Input</span>Average length of user messages per call. For multi-turn, this is per turn.</span></span></label>
+      <input type="number" id="api-user" value="100" min="0" onchange="calcAPI()">
+    </div>
+    <div class="field">
+      <label><span class="ti"><span>Avg output (words)</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Output Length</span>Output tokens cost 3–5× more than input. Keep this realistic — structured JSON responses are often shorter than prose.</span></span></label>
+      <input type="number" id="api-out" value="250" min="0" onchange="calcAPI()">
+    </div>
+  </div>
+  <div style="margin-bottom:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <label style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;font-weight:500">Calls per month: <span id="api-calls-val" style="color:var(--grn)">500</span></label>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:10px;color:var(--mut)">Multi-turn?</span>
+        <select id="api-turns" style="background:var(--sur2);border:1px solid var(--bor);border-radius:4px;padding:3px 6px;font-size:10px;color:var(--txt);font-family:inherit;outline:none" onchange="calcAPI()">
+          <option value="1">Single call</option><option value="3">3 turns</option><option value="5">5 turns</option><option value="10">10 turns</option>
+        </select>
+      </div>
+    </div>
+    <input type="range" id="api-calls" min="1" max="10000" value="500" step="1" oninput="document.getElementById('api-calls-val').textContent=this.value;calcAPI()">
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mut)"><span>1</span><span>10,000/mo</span></div>
+  </div>
+  <div style="margin-bottom:12px">
+    <label style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.4px;font-weight:500;display:block;margin-bottom:6px">System prompt text (paste for exact token count)</label>
+    <textarea style="background:var(--sur2);border:1px solid var(--bor);border-radius:5px;padding:8px;font-size:11px;color:var(--txt);font-family:inherit;width:100%;resize:vertical;outline:none;min-height:60px;line-height:1.4" id="api-sys-text" placeholder="Paste your system prompt here for exact token count..." oninput="calcAPIFromText()"></textarea>
+  </div>
+  <div style="margin-bottom:14px">
+    <button onclick="calcAPI()" style="padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">Calculate cost</button>
+  </div>
+  <div id="api-results" style="display:none">
+    <div class="metrics-3">
+      <div class="met"><div class="met-l">Cost per call</div><div class="met-v g" id="api-per-call">$0.00</div></div>
+      <div class="met"><div class="met-l">Monthly cost</div><div class="met-v a" id="api-monthly">$0.00</div></div>
+      <div class="met"><div class="met-l">Annual est.</div><div class="met-v" id="api-annual">$0.00</div></div>
+    </div>
+    <div style="display:flex;align-items:center;margin-bottom:6px">
+      <span class="sec-t" style="margin:0">All models at your volume</span>
+      <span class="price-ts">· Pricing verified Apr 2025</span>
+    </div>
+    <div class="scroll"><table class="tbl"><thead><tr><th>Model</th><th>Provider</th><th>Per call</th><th>Monthly</th><th>vs current</th></tr></thead><tbody id="api-cmp-tbody"></tbody></table></div>
+    <div id="api-insights" style="margin-top:14px"></div>
+  </div>
+</div>
+
+<!-- CLAUDE CODE MODE -->
+<div id="mode-code" class="panel">
+  <div style="font-size:11px;color:var(--mut);margin-bottom:14px;line-height:1.6;background:rgba(167,139,250,.07);border:1px solid rgba(167,139,250,.25);border-radius:7px;padding:9px 13px">Claude Code sessions are token-heavy. The agent reads files, writes code, runs commands, reads results, and iterates — all billed as input/output tokens via the Anthropic API. <strong style="color:var(--pur)">Claude Code via Claude.ai uses your subscription allowance, not API tokens.</strong></div>
+  <div class="grid2">
+    <div class="field">
+      <label><span class="ti"><span>Claude model</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Model</span>Sonnet 4.6 is the recommended default for Claude Code. Opus is significantly more expensive per session.</span></span></label>
+      <select id="cc-model" onchange="calcCC()"><option value="sonnet">Claude Sonnet 4.6 (recommended)</option><option value="opus">Claude Opus 4.6</option><option value="haiku35">Claude Haiku 3.5</option></select>
+    </div>
+    <div class="field">
+      <label><span class="ti"><span>Sessions per month</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Sessions</span>One session = one focused coding task from start to finish. A typical developer runs 15–30 sessions/month.</span></span></label>
+      <input type="number" id="cc-sessions" value="20" min="1" onchange="calcCC()">
+    </div>
+  </div>
+  <div class="sec-t">Typical session profile</div>
+  <div class="grid3">
+    <div class="field">
+      <label><span class="ti"><span>Files read per session</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">File Reads</span>Each file read ≈ 200 lines ≈ 1,200 tokens. Reading many files before coding is the largest input token driver.</span></span></label>
+      <input type="number" id="cc-files" value="5" min="0" onchange="calcCC()"><span style="font-size:10px;color:var(--mut);margin-top:3px">avg 200 lines each</span>
+    </div>
+    <div class="field">
+      <label><span class="ti"><span>Iteration rounds</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Iterations</span>Write → test → fix cycles. Each round adds context. Complex bugs may need 6–10 rounds.</span></span></label>
+      <input type="number" id="cc-iters" value="4" min="1" onchange="calcCC()"><span style="font-size:10px;color:var(--mut);margin-top:3px">write → test → fix</span>
+    </div>
+    <div class="field">
+      <label><span class="ti"><span>Tool calls per round</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Tool Calls</span>bash, read_file, write_file, etc. Each tool call result adds ~200 input tokens.</span></span></label>
+      <input type="number" id="cc-tools" value="3" min="0" onchange="calcCC()"><span style="font-size:10px;color:var(--mut);margin-top:3px">bash, read_file, etc.</span>
+    </div>
+  </div>
+  <div class="grid2" style="margin-bottom:12px">
+    <div class="field">
+      <label><span class="ti"><span>Lines of code written</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Code Output</span>Each line of code ≈ 5 output tokens. Output tokens cost 3–5× more than input.</span></span></label>
+      <input type="number" id="cc-lines" value="150" min="0" onchange="calcCC()">
+    </div>
+    <div class="field">
+      <label><span class="ti"><span>Context window growth</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Context Growth</span>High growth = complex refactors or long sessions where earlier context stays in window. Multiplies total input tokens.</span></span></label>
+      <select id="cc-ctx" onchange="calcCC()"><option value="low">Low — short tasks</option><option value="med" selected>Medium — typical</option><option value="high">High — complex refactors</option></select>
+    </div>
+  </div>
+  <div style="margin-bottom:14px">
+    <button onclick="calcCC()" style="padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">Calculate session cost</button>
+  </div>
+  <div id="cc-results" style="display:none">
+    <div class="metrics">
+      <div class="met"><div class="met-l">Input tok/session</div><div class="met-v p" id="cc-in-tok">0</div></div>
+      <div class="met"><div class="met-l">Output tok/session</div><div class="met-v p" id="cc-out-tok">0</div></div>
+      <div class="met"><div class="met-l">Cost per session</div><div class="met-v p" id="cc-per-sess">$0.00</div></div>
+      <div class="met"><div class="met-l">Monthly cost</div><div class="met-v a" id="cc-monthly">$0.00</div></div>
+    </div>
+    <div class="sec-t">Session token breakdown</div>
+    <div id="cc-breakdown" style="background:var(--sur);border:1px solid var(--bor);border-radius:7px;padding:12px;margin-bottom:14px;font-size:11px;line-height:2"></div>
+    <div class="sec-t">Model comparison</div>
+    <table class="tbl" style="margin-bottom:14px"><thead><tr><th>Model</th><th>Per session</th><th>Monthly</th><th>Annual</th></tr></thead><tbody id="cc-cmp-tbody"></tbody></table>
+    <div id="cc-insights"></div>
+  </div>
+</div>
+
+<!-- PLAN ADVISOR MODE -->
+<div id="mode-plan" class="panel">
+  <div style="font-size:11px;color:var(--mut);margin-bottom:14px;line-height:1.6;background:rgba(20,184,166,.07);border:1px solid rgba(20,184,166,.25);border-radius:7px;padding:9px 13px">Claude.ai uses subscription pricing — flat monthly fee, not per token. This advisor helps you choose the right plan tier based on your usage patterns.</div>
+  <div class="grid2">
+    <div class="field">
+      <label><span class="ti"><span>Messages per day</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Message Volume</span>Count all messages across all conversations. Heavy Claude Code usage counts toward this limit on Claude.ai.</span></span></label>
+      <select id="plan-msgs" onchange="calcPlan()"><option value="5">1–5 (light)</option><option value="20" selected>6–20 (moderate)</option><option value="50">21–50 (heavy)</option><option value="100">50+ (power user)</option></select>
+    </div>
+    <div class="field">
+      <label><span class="ti"><span>Primary model</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Model Usage</span>Opus uses significantly more of your message allowance per conversation than Sonnet or Haiku.</span></span></label>
+      <select id="plan-model" onchange="calcPlan()"><option value="haiku">Haiku</option><option value="sonnet" selected>Sonnet</option><option value="opus">Opus</option><option value="mixed">Mixed</option></select>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label><span class="ti"><span>Team size</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Team Size</span>Pro is per-user. Team adds shared Projects and admin controls at $25/user/mo. Enterprise adds SSO, audit logs, and SLA.</span></span></label>
+      <select id="plan-team" onchange="calcPlan()"><option value="1" selected>Just me</option><option value="5">2–5</option><option value="15">6–15</option><option value="50">16–50</option><option value="100">50+</option></select>
+    </div>
+    <div class="field">
+      <label><span class="ti"><span>Features needed</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Features</span>Projects + extended context requires Pro or above. API access is billed separately from all subscription tiers.</span></span></label>
+      <select id="plan-features" onchange="calcPlan()"><option value="basic">Basic chat</option><option value="projects" selected>Projects + extended context</option><option value="api">API access</option><option value="enterprise">SSO + admin controls</option></select>
+    </div>
+  </div>
+  <div class="grid2" style="margin-bottom:14px">
+    <div class="field">
+      <label><span class="ti"><span>Use Claude Code?</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Claude Code</span>Via Claude.ai = uses subscription allowance. Via API = per-token billing. Heavy Claude Code via subscription can exhaust limits fast.</span></span></label>
+      <select id="plan-code" onchange="calcPlan()"><option value="no" selected>No</option><option value="light">Occasionally</option><option value="heavy">Daily coding</option></select>
+    </div>
+    <div class="field">
+      <label><span class="ti"><span>Context window needs</span><span class="ti-i" tabindex="0">i</span><span class="ti-box"><span class="tt">Context Window</span>Long docs, large codebases, or multi-document analysis require higher context. Max context is available on Pro and above.</span></span></label>
+      <select id="plan-ctx" onchange="calcPlan()"><option value="short">Short conversations</option><option value="long" selected>Long docs / codebases</option><option value="max">Maximum always</option></select>
+    </div>
+  </div>
+  <div style="margin-bottom:14px">
+    <button onclick="calcPlan()" style="padding:8px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981">Get recommendation</button>
+  </div>
+  <div id="plan-results" style="display:none">
+    <div class="sec-t">Plan comparison</div>
+    <div class="plan-grid" id="plan-cards"></div>
+    <div id="plan-insights"></div>
+    <div id="plan-api-crossover" style="display:none;background:var(--sur);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:12px;font-size:11px;color:var(--mut);line-height:1.6;margin-top:10px">
+      <div style="color:var(--amb);font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600">API vs subscription crossover</div>
+      <span id="plan-crossover-txt"></span>
+    </div>
+    <div style="background:var(--sur);border:1px solid var(--bor);border-radius:7px;padding:12px;font-size:11px;color:var(--mut);line-height:1.6;margin-top:10px">
+      <div style="color:#14b8a6;font-size:10px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;font-weight:600">API vs subscription</div>
+      API pricing (pay per token) is separate from Claude.ai subscriptions. Use <strong style="color:var(--txt)">API Calls</strong> mode to estimate programmatic usage costs independently.
+    </div>
+  </div>
+</div>
+</div><!-- end .w -->
+
+<script>
+var P={
+  haiku35:{i:.80,o:4.00,lbl:'Haiku 3.5',prov:'ant'},
+  haiku45:{i:1.00,o:5.00,lbl:'Haiku 4.5',prov:'ant'},
+  sonnet:{i:3.00,o:15.00,lbl:'Sonnet 4.6',prov:'ant'},
+  opus:{i:5.00,o:25.00,lbl:'Opus 4.6',prov:'ant'},
+  gpt41mini:{i:.40,o:1.60,lbl:'GPT-4.1 mini',prov:'oai'},
+  gpt4omini:{i:.15,o:.60,lbl:'GPT-4o mini',prov:'oai'},
+  gpt4o:{i:2.50,o:10.00,lbl:'GPT-4o',prov:'oai'},
+  gpt41:{i:2.00,o:8.00,lbl:'GPT-4.1',prov:'oai'}
+};
+var CACHE={ant:.90,oai:.50};
+var PRICING_DATE='Apr 2025';
+
+// LLM node types — includes httpRequest detection for raw API calls
+var LLM_T=['@n8n/n8n-nodes-langchain.openai','@n8n/n8n-nodes-langchain.lmchatanthropic','@n8n/n8n-nodes-langchain.lmchatopenai','@n8n/n8n-nodes-langchain.anthropic','@n8n/n8n-nodes-langchain.agent','@n8n/n8n-nodes-langchain.openaiassistant','n8n-nodes-base.openai'];
+var LOOP_T=['n8n-nodes-base.splitinbatches','n8n-nodes-base.splitout'];
+var W2T=1.35;
+var nodes=[],wfName='',openCalIdx=-1,wizStep=0,wizNodes=[],curN8nTab='';
+var GRN_BTN='padding:8px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981';
+var GRN_BTN_SM='padding:5px 10px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;background:#10b981;color:#000;border:2px solid #10b981';
+var GRN_BTN_DIM='padding:8px 14px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;background:rgba(16,185,129,.2);color:#6ee7b7;border:2px solid rgba(16,185,129,.5)';
+
+function w2t(w){return Math.round(w*W2T);}
+function c2t(c){return Math.round(c/4);}
+function cc(n,mk){var p=P[mk||n.model];if(!p||!n.isLLM)return 0;return(n.inTok*p.i+n.outTok*p.o)/1e6;}
+function mc(n,mk){return cc(n,mk)*n.calls;}
+function tot(){return nodes.reduce(function(s,n){return s+mc(n);},0);}
+function fmm(v){return'$'+v.toFixed(2);}
+function fm4(v){return'$'+v.toFixed(4);}
+
+// ─── HTTPREQUEST LLM DETECTION ───────────────────────────────────────────────
+// Detects Claude or OpenAI calls made via raw HTTP Request nodes
+function isHttpLLM(n){
+  var t=(n.type||'').toLowerCase();
+  if(t!=='n8n-nodes-base.httprequest')return false;
+  var url='';
+  try{url=(n.parameters.url||n.parameters.uri||'').toLowerCase();}catch(e){}
+  return url.indexOf('api.anthropic.com/v1/messages')>-1||url.indexOf('api.openai.com/v1/chat/completions')>-1;
+}
+function isLLM(n){
+  var t=(n.type||'').toLowerCase();
+  for(var i=0;i<LLM_T.length;i++)if(t===LLM_T[i].toLowerCase())return true;
+  if(t.indexOf('langchain')>-1&&(t.indexOf('openai')>-1||t.indexOf('anthropic')>-1||t.indexOf('lmchat')>-1||t.indexOf('agent')>-1))return true;
+  if(isHttpLLM(n))return true;
+  return false;
+}
+function detectModelFromHttpRequest(n){
+  var url='';
+  try{url=(n.parameters.url||n.parameters.uri||'').toLowerCase();}catch(e){}
+  if(url.indexOf('api.openai.com')>-1){
+    var body='';
+    try{body=JSON.stringify(n.parameters.body||n.parameters.jsonBody||{}).toLowerCase();}catch(e){}
+    if(body.indexOf('gpt-4.1-mini')>-1)return'gpt41mini';
+    if(body.indexOf('gpt-4o-mini')>-1)return'gpt4omini';
+    if(body.indexOf('gpt-4.1')>-1)return'gpt41';
+    if(body.indexOf('gpt-4o')>-1)return'gpt4o';
+    return'gpt4o';
+  }
+  if(url.indexOf('api.anthropic.com')>-1){
+    var body2='';
+    try{body2=JSON.stringify(n.parameters.body||n.parameters.jsonBody||{}).toLowerCase();}catch(e){}
+    if(body2.indexOf('haiku')>-1)return'haiku35';
+    if(body2.indexOf('opus')>-1)return'opus';
+    return'sonnet';
+  }
+  return'gpt41mini';
+}
+function detectModel(n){
+  if(isHttpLLM(n))return detectModelFromHttpRequest(n);
+  var mv='';
+  try{mv=(n.parameters.modelId&&n.parameters.modelId.value||n.parameters.model&&(n.parameters.model.value||n.parameters.model)||'').toString().toLowerCase();}catch(e){}
+  if(mv.indexOf('gpt-4.1-mini')>-1)return'gpt41mini';
+  if(mv.indexOf('gpt-4o-mini')>-1)return'gpt4omini';
+  if(mv.indexOf('gpt-4.1')>-1)return'gpt41';
+  if(mv.indexOf('gpt-4o')>-1)return'gpt4o';
+  if(mv.indexOf('gpt-4')>-1)return'gpt4o';
+  if(mv.indexOf('haiku')>-1)return'haiku35';
+  if(mv.indexOf('opus')>-1)return'opus';
+  if(mv.indexOf('sonnet')>-1)return'sonnet';
+  var t=(n.type||'').toLowerCase();
+  if(t.indexOf('anthropic')>-1)return'sonnet';
+  return'gpt41mini';
+}
+function isLoop(n){var t=(n.type||'').toLowerCase();for(var i=0;i<LOOP_T.length;i++)if(t===LOOP_T[i])return true;return false;}
+function getSys(n){
+  if(isHttpLLM(n)){
+    var body='';
+    try{var b=n.parameters.body||n.parameters.jsonBody||{};if(typeof b==='string')b=JSON.parse(b);var msgs=b.messages||[];for(var i=0;i<msgs.length;i++){if(msgs[i].role==='system'){return{tok:c2t(msgs[i].content.length),isStatic:true};}}}catch(e){}
+    return{tok:w2t(60),isStatic:false};
+  }
+  var rv=[];try{rv=n.parameters.responses.values||[];}catch(e){}
+  for(var i=0;i<rv.length;i++){if(rv[i].role==='system'&&rv[i].content)return{tok:c2t(rv[i].content.length),isStatic:rv[i].content.indexOf('{{')===-1};}
+  var s='';try{s=n.parameters.systemMessage||n.parameters.system||'';}catch(e){}
+  if(s)return{tok:c2t(s.length),isStatic:s.indexOf('{{')===-1};
+  return{tok:w2t(60),isStatic:false};
+}
+function getUser(n){
+  if(isHttpLLM(n)){return{tok:w2t(120),hasDynamic:true};}
+  var rv=[];try{rv=n.parameters.responses.values||[];}catch(e){}
+  for(var i=0;i<rv.length;i++){
+    if((!rv[i].role||rv[i].role==='user')&&rv[i].content){
+      var c=rv[i].content;
+      var tmpl=c2t(c.replace(/\{\{[^}]+\}\}/g,'').length);
+      var dyn=c.indexOf('JSON.stringify')>-1?w2t(150):c.indexOf('$json')>-1?w2t(80):0;
+      return{tok:tmpl+dyn,hasDynamic:dyn>0};
+    }
+  }
+  return{tok:w2t(120),hasDynamic:true};
+}
+function detectLoopMult(parsed,nodeName){
+  var connections=parsed.connections||{};
+  var visited={};
+  function up(name,depth){
+    if(depth>10||visited[name])return 1;
+    visited[name]=true;
+    var found=1;
+    Object.keys(connections).forEach(function(src){
+      var targets=connections[src].main||[];
+      targets.forEach(function(group){
+        (group||[]).forEach(function(conn){
+          if(conn.node===name){
+            var srcNode=(parsed.nodes||[]).find(function(x){return x.name===src;});
+            if(srcNode&&isLoop(srcNode)){
+              var bs=3;
+              try{bs=parseInt(srcNode.parameters.batchSize)||3;}catch(e){}
+              found=Math.max(found,bs);
+            }
+            found=Math.max(found,up(src,depth+1));
+          }
+        });
+      });
+    });
+    return found;
+  }
+  return up(nodeName,0);
+}
+function parseWFJSON(raw){
+  var p=JSON.parse(raw);
+  wfName=p.name||'Unnamed workflow';
+  var baseRuns=parseInt(document.getElementById('wf-runs').value)||30;
+  return(p.nodes||[]).map(function(n){
+    var llm=isLLM(n);
+    var model=llm?detectModel(n):'haiku35';
+    var sys=llm?getSys(n):{tok:0,isStatic:true};
+    var usr=llm?getUser(n):{tok:0,hasDynamic:false};
+    var lm=llm?detectLoopMult(p,n.name):1;
+    return{
+      name:n.name||n.id||'Unnamed',nodeType:n.type||'',model:model,isLLM:llm,
+      inTok:sys.tok+usr.tok,outTok:llm?w2t(220):0,
+      sysTok:sys.tok,sysStatic:sys.isStatic,
+      calls:baseRuns*lm,baseCalls:baseRuns,loopMult:lm,
+      accuracy:'est',hasDynamic:usr.hasDynamic,
+      calText:'',calTok:0,calOutText:'',calOutTok:0,outCalibrated:false,
+      nodeRaw:n
+    };
+  });
+}
+function applyWfRuns(){
+  if(!nodes.length)return;
+  var baseRuns=parseInt(document.getElementById('wf-runs').value)||30;
+  nodes.forEach(function(n){
+    n.baseCalls=baseRuns;
+    n.calls=baseRuns*n.loopMult;
+  });
+  renderN8nAll();
+}
+function parseWF(){
+  var raw=document.getElementById('wf-paste').value.trim();
+  if(!raw){showN8nErr('Paste your workflow JSON first.');return;}
+  try{
+    nodes=parseWFJSON(raw);
+    openCalIdx=-1;
+    hideN8nErr();
+    document.getElementById('parse-status').textContent='✓ Parsed — '+nodes.length+' nodes, '+nodes.filter(function(n){return n.isLLM;}).length+' LLM';
+    var wb=document.getElementById('wiz-btn');wb.style.display='inline-flex';wb.style.cssText+=';'+GRN_BTN;
+    var ob=document.getElementById('opt-btn');ob.style.display='inline-flex';ob.style.cssText+=';'+GRN_BTN;
+    renderN8nAll();
+  }catch(e){showN8nErr('Cannot parse JSON: '+e.message);}
+}
+function applyExLog(){
+  var raw=document.getElementById('ex-paste').value.trim();
+  if(!raw||!nodes.length)return;
+  try{
+    var p=JSON.parse(raw);
+    var rd=(p.data&&p.data.resultData&&p.data.resultData.runData)||(p.resultData&&p.resultData.runData)||p.runData||p;
+    var matched=0;
+    nodes.forEach(function(n){
+      if(!n.isLLM)return;
+      var runs=rd[n.name];
+      if(!runs||!runs.length)return;
+      var s=runs.map(function(r){
+        var d=(r.data&&r.data.main&&r.data.main[0]&&r.data.main[0][0]&&r.data.main[0][0].json)||{};
+        return c2t(JSON.stringify(d).length);
+      });
+      var avg=Math.round(s.reduce(function(a,x){return a+x;},0)/s.length);
+      if(avg>10){n.inTok=avg;n.accuracy='ver';matched++;}
+    });
+    document.getElementById('parse-status').textContent='✓ '+matched+' nodes upgraded to VER';
+    renderN8nAll();
+  }catch(e){showN8nErr('Cannot parse log: '+e.message);}
+}
+function showN8nErr(m){var e=document.getElementById('n8n-err');e.textContent=m;e.style.display='block';}
+function hideN8nErr(){document.getElementById('n8n-err').style.display='none';}
+function clearWF(){
+  nodes=[];wfName='';openCalIdx=-1;
+  document.getElementById('wf-paste').value='';
+  document.getElementById('ex-paste').value='';
+  document.getElementById('n8n-results').style.display='none';
+  document.getElementById('wiz-btn').style.display='none';
+  document.getElementById('opt-btn').style.display='none';
+  document.getElementById('wiz-panel').style.display='none';
+  document.getElementById('opt-panel').style.display='none';
+  document.getElementById('parse-status').textContent='';
+  hideN8nErr();
+}
+function renderN8nAll(){
+  document.getElementById('n8n-results').style.display='block';
+  document.getElementById('wf-name-bar').innerHTML=wfName?'<div class="wf-n">'+wfName+'</div>':'';
+  renderConfBar();renderN8nMetrics();renderN8nRows();renderN8nTotal();renderCacheAlert();
+  if(curN8nTab)switchN8nTab(curN8nTab);
+}
+function renderConfBar(){
+  var llm=nodes.filter(function(n){return n.isLLM;});
+  var est=llm.filter(function(n){return n.accuracy==='est';}).length;
+  var cal=llm.filter(function(n){return n.accuracy==='cal';}).length;
+  var ver=llm.filter(function(n){return n.accuracy==='ver';}).length;
+  var ov=ver>0&&ver===llm.length?'ver':cal+ver===llm.length&&llm.length>0?'cal':'est';
+  var h='<span style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;font-weight:500">Accuracy:</span>';
+  if(est)h+='<span style="display:flex;align-items:center;gap:4px;font-size:11px"><span class="pill p-est">EST</span>'+est+'</span>';
+  if(cal)h+='<span style="display:flex;align-items:center;gap:4px;font-size:11px"><span class="pill p-cal">CAL</span>'+cal+'</span>';
+  if(ver)h+='<span style="display:flex;align-items:center;gap:4px;font-size:11px"><span class="pill p-ver">VER</span>'+ver+'</span>';
+  h+='<span style="margin-left:auto;font-size:10px;color:var(--mut)">Overall: <span class="pill p-'+ov+'">'+ov.toUpperCase()+'</span></span>';
+  document.getElementById('conf-bar').innerHTML=h;
+}
+function renderN8nMetrics(){
+  var llm=nodes.filter(function(n){return n.isLLM;});
+  var oai=llm.filter(function(n){return P[n.model]&&P[n.model].prov==='oai';}).length;
+  var ant=llm.filter(function(n){return P[n.model]&&P[n.model].prov==='ant';}).length;
+  var prov='';
+  if(ant)prov+='<span style="color:var(--amb)">ANT'+(ant>1?' ×'+ant:'')+'</span>';
+  if(ant&&oai)prov+=' ';
+  if(oai)prov+='<span style="color:var(--blu)">OAI'+(oai>1?' ×'+oai:'')+'</span>';
+  document.getElementById('n8n-metrics').innerHTML='<div class="met"><div class="met-l">Total nodes</div><div class="met-v">'+nodes.length+'</div></div><div class="met"><div class="met-l">LLM nodes</div><div class="met-v a">'+llm.length+'</div></div><div class="met"><div class="met-l">Providers</div><div class="met-v" style="font-size:13px;padding-top:3px">'+prov+'</div></div><div class="met"><div class="met-l">Monthly est.</div><div class="met-v a">'+fmm(tot())+'</div></div>';
+}
+function mtog(i,model){
+  var prov=P[model]&&P[model].prov||'ant';
+  var ms=prov==='oai'?[['gpt4omini','4om'],['gpt41mini','4.1m'],['gpt4o','4o'],['gpt41','4.1']]:[['haiku35','H'],['sonnet','S'],['opus','O']];
+  var cols={haiku35:'var(--grn)',sonnet:'var(--amb)',opus:'var(--red)',gpt4omini:'var(--pur)',gpt41mini:'var(--pur)',gpt4o:'var(--blu)',gpt41:'var(--blu)'};
+  return'<div class="mtog">'+ms.map(function(m){var a=model===m[0];return'<button class="mb" style="'+(a?'background:rgba(255,255,255,.1);color:'+cols[m[0]]+';font-weight:700;border:none':'')+'" onclick="setMod('+i+',\''+m[0]+'\')">'+m[1]+'</button>';}).join('')+'</div>';
+}
+function apill(a){return a==='ver'?'<span class="pill p-ver">VER</span>':a==='cal'?'<span class="pill p-cal">CAL</span>':'<span class="pill p-est">EST</span>';}
+function renderN8nRows(){
+  var llm=nodes.filter(function(n){return n.isLLM;});
+  var maxC=Math.max.apply(null,llm.map(function(n){return mc(n);}).concat([.000001]));
+  var h='';
+  nodes.forEach(function(n,i){
+    var mCost=mc(n);
+    var bar=n.isLLM?Math.round((mCost/maxC)*40):0;
+    var prov=P[n.model]&&P[n.model].prov||'ant';
+    var lb=n.loopMult>1?'<span class="loop-badge">×'+n.loopMult+'</span>':'';
+    var calLbl=n.accuracy==='ver'?'VER':n.accuracy==='cal'?'Cal\'d':'Calibrate';
+    var calBg=n.accuracy==='ver'?GRN_BTN_DIM:n.accuracy==='cal'?GRN_BTN_DIM:GRN_BTN_SM;
+    // out tok color: green if calibrated, blue if CAL, mut if EST
+    var outColor=n.outCalibrated?'var(--grn)':n.accuracy==='cal'?'var(--blu)':'var(--mut)';
+    h+='<tr><td style="font-weight:600;max-width:110px;word-break:break-word">'+n.name+lb+'</td><td><span class="pill '+(n.isLLM?'p-llm':'p-tool')+'">'+(n.isLLM?'LLM':'Tool')+'</span></td><td>'+(n.isLLM?'<span class="pill '+(prov==='oai'?'p-oai':'p-ant')+'">'+(prov==='oai'?'OAI':'ANT')+'</span>':'—')+'</td><td>'+(n.isLLM?mtog(i,n.model):'—')+'</td><td>'+(n.isLLM?apill(n.accuracy):'—')+'</td><td style="color:'+(n.accuracy==='ver'?'var(--grn)':n.accuracy==='cal'?'var(--blu)':'var(--mut)')+'">'+(n.isLLM?n.inTok.toLocaleString():'—')+'</td><td style="color:'+outColor+'">'+(n.isLLM?n.outTok.toLocaleString():'—')+'</td><td><input type="number" value="'+n.calls+'" min="1" onchange="nodes['+i+'].calls=parseInt(this.value)||1;renderAfterN8nEdit()" style="width:58px"></td><td>'+(n.isLLM?'<div style="display:flex;align-items:center;gap:5px"><span style="color:var(--amb);min-width:44px;font-weight:600;font-size:12px">'+fmm(mCost)+'</span><div style="height:3px;border-radius:2px;background:var(--amb);width:'+bar+'px"></div></div>':'<span style="color:var(--mut)">$0.00</span>')+'</td><td>'+(n.isLLM?'<button onclick="toggleCal('+i+')" style="'+calBg+'">'+calLbl+'</button>':'')+'</td></tr>';
+  });
+  document.getElementById('n8n-tbody').innerHTML=h;
+  renderCalPanels();
+}
+function renderCalPanels(){
+  var cp=document.getElementById('cal-panels');
+  if(openCalIdx<0||!nodes[openCalIdx]){cp.innerHTML='';return;}
+  var n=nodes[openCalIdx];
+  var i=openCalIdx;
+  cp.innerHTML='<div style="background:var(--sur2);border:1px solid rgba(59,130,246,.3);border-radius:7px;padding:12px;margin-top:7px"><div style="font-size:10px;color:var(--blu);text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px;font-weight:600">Calibrate "'+n.name+'"</div><div style="margin-bottom:8px"><div style="font-size:10px;color:var(--mut);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">Input payload</div><textarea style="background:var(--sur);border:1px solid var(--bor);border-radius:5px;padding:8px;font-size:11px;color:var(--txt);font-family:inherit;width:100%;resize:vertical;outline:none;min-height:55px;line-height:1.4" id="cal-in" placeholder=\'{"query":"mongolian yurt","clicks":12}\'>'+n.calText+'</textarea><div style="font-size:10px;color:var(--grn);margin-top:3px;min-height:14px" id="cal-in-prev">'+(n.calTok?'~'+n.calTok+' tokens':'paste to count')+'</div></div><div style="margin-bottom:9px"><div style="font-size:10px;color:var(--mut);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">Output sample <span style="color:var(--grn);font-weight:700">(paste real output for accurate out tok)</span></div><textarea style="background:var(--sur);border:1px solid rgba(16,185,129,.3);border-radius:5px;padding:8px;font-size:11px;color:var(--txt);font-family:inherit;width:100%;resize:vertical;outline:none;min-height:55px;line-height:1.4" id="cal-out" placeholder=\'{"aeo_title":"...","meta_desc":"..."}\'>'+n.calOutText+'</textarea><div style="font-size:10px;color:var(--grn);margin-top:3px;min-height:14px" id="cal-out-prev">'+(n.calOutTok?'~'+n.calOutTok+' tokens — out tok calibrated ✓':'paste a real output sample to count')+'</div></div><div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center"><button onclick="applyCalibration('+i+')" style="'+GRN_BTN+'">Apply</button><button onclick="resetCal('+i+')" style="'+GRN_BTN_DIM+'">Reset</button><button onclick="openCalIdx=-1;renderN8nRows()" style="margin-left:auto;'+GRN_BTN_DIM+'">Close</button></div></div>';
+  var tin=document.getElementById('cal-in');
+  var tout=document.getElementById('cal-out');
+  if(tin)tin.addEventListener('input',function(){var el=document.getElementById('cal-in-prev');if(el)el.textContent='~'+c2t(this.value.length)+' tokens';});
+  if(tout)tout.addEventListener('input',function(){var el=document.getElementById('cal-out-prev');if(el)el.textContent='~'+c2t(this.value.length)+' tokens';});
+}
+function toggleCal(i){openCalIdx=openCalIdx===i?-1:i;renderN8nRows();}
+function applyCalibration(i){
+  var tin=document.getElementById('cal-in');
+  var tout=document.getElementById('cal-out');
+  if(!tin)return;
+  var inT=tin.value.trim();
+  var outT=tout?tout.value.trim():'';
+  if(inT){nodes[i].calText=inT;nodes[i].calTok=c2t(inT.length);nodes[i].inTok=nodes[i].sysTok+nodes[i].calTok;}
+  if(outT){nodes[i].calOutText=outT;nodes[i].calOutTok=c2t(outT.length);nodes[i].outTok=nodes[i].calOutTok;nodes[i].outCalibrated=true;}
+  nodes[i].accuracy='cal';
+  openCalIdx=-1;
+  renderN8nAll();
+}
+function resetCal(i){nodes[i].accuracy='est';nodes[i].calText='';nodes[i].calTok=0;nodes[i].calOutText='';nodes[i].calOutTok=0;nodes[i].outCalibrated=false;openCalIdx=-1;renderN8nAll();}
+function setMod(i,m){nodes[i].model=m;renderAfterN8nEdit();}
+function renderAfterN8nEdit(){renderN8nMetrics();renderN8nRows();renderN8nTotal();renderCacheAlert();if(curN8nTab)switchN8nTab(curN8nTab);}
+function renderN8nTotal(){
+  var llm=nodes.filter(function(n){return n.isLLM;});
+  var ov=llm.length&&llm.every(function(n){return n.accuracy==='ver';})?'ver':llm.length&&llm.every(function(n){return n.accuracy!=='est';})?'cal':'est';
+  document.getElementById('n8n-total').textContent=fmm(tot());
+  document.getElementById('n8n-conf').textContent='Confidence: '+ov.toUpperCase();
+}
+function renderCacheAlert(){
+  var llm=nodes.filter(function(n){return n.isLLM&&n.sysStatic&&n.sysTok>0;});
+  var box=document.getElementById('cache-alert');
+  if(!llm.length){box.style.display='none';return;}
+  var sav=llm.reduce(function(s,n){var d=CACHE[P[n.model]&&P[n.model].prov||'ant'];return s+(n.sysTok*(P[n.model]&&P[n.model].i||0)/1e6)*d*n.calls;},0);
+  if(sav<.001){box.style.display='none';return;}
+  box.style.display='block';
+  box.innerHTML='<div class="cache-t">Caching opportunity</div><div style="font-size:11px;color:var(--txt)">Static system prompts eligible for caching — est. <span style="color:var(--pur);font-weight:700">'+fmm(sav)+'</span>/month savings.</div>';
+}
+function switchN8nTab(t){
+  curN8nTab=t;
+  var sub=document.getElementById('n8n-sub');
+  sub.style.display='block';
+  if(t==='compare'){
+    var llm=nodes.filter(function(n){return n.isLLM;});
+    var cur=tot();
+    function card(lbl,col,mk){
+      var v=llm.reduce(function(s,n){return s+mc(n,mk);},0);
+      var d=v-cur;var sg=d>=0?'+':'';
+      return'<div class="met" style="text-align:center"><div class="met-l">'+lbl+'</div><div class="met-v" style="color:'+col+';font-size:16px">'+fmm(v)+'</div><div style="font-size:10px;color:var(--mut)">'+sg+fmm(d)+'</div></div>';
+    }
+    sub.innerHTML='<div class="sec-t">Anthropic tiers</div><div class="metrics">'+card('Haiku 3.5','var(--grn)','haiku35')+card('Sonnet 4.6','var(--amb)','sonnet')+card('Opus 4.6','var(--red)','opus')+'<div class="met" style="text-align:center;border-color:var(--amb)"><div class="met-l">Current</div><div class="met-v a" style="font-size:16px">'+fmm(cur)+'</div></div></div><div class="sec-t">OpenAI tiers</div><div class="metrics"><div></div>'+card('GPT-4.1 mini','var(--pur)','gpt41mini')+card('GPT-4o','var(--blu)','gpt4o')+'<div></div></div>';
+  }else if(t==='insights'){
+    var llm=nodes.filter(function(n){return n.isLLM;});
+    var ins=[];
+    var sN=llm.filter(function(n){return n.sysStatic&&n.sysTok>0;});
+    if(sN.length){var sv=sN.reduce(function(s,n){var d=CACHE[P[n.model].prov];return s+(n.sysTok*P[n.model].i/1e6)*d*n.calls;},0);if(sv>.001)ins.push({d:'var(--pur)',l:'caching opportunity',c:'color:var(--pur)',t:sN.length+' node'+(sN.length>1?'s':'')+'  with static prompts. Est. '+fmm(sv)+'/mo savings.'});}
+    if(llm.length){var top=llm.reduce(function(a,b){return mc(b)>mc(a)?b:a;},llm[0]);ins.push({d:'var(--blu)',l:'cost driver',c:'color:var(--blu)',t:'"'+top.name+'" highest cost at '+fmm(mc(top))+'/mo ('+P[top.model].lbl+').'});}
+    llm.filter(function(n){return n.model==='opus'&&n.outTok<500;}).forEach(function(n){ins.push({d:'var(--amb)',l:'model review',c:'color:var(--amb)',t:'"'+n.name+'" uses Opus with short outputs. May be Sonnet-eligible.',s:'Saving: '+fmm(mc(n,'opus')-mc(n,'sonnet'))+'/mo'});});
+    llm.filter(function(n){return n.loopMult>1;}).forEach(function(n){ins.push({d:'var(--pur)',l:'loop node',c:'color:var(--pur)',t:'"'+n.name+'" in a loop (×'+n.loopMult+'). Verify calls/mo matches your actual batch size.'});});
+    llm.filter(function(n){return!n.outCalibrated;}).forEach(function(n){ins.push({d:'var(--amb)',l:'output uncalibrated',c:'color:var(--amb)',t:'"'+n.name+'" out tok defaults to ~297. Paste a real output in Calibrate for accuracy.'});});
+    sub.innerHTML='<div class="sec-t">Insights</div>'+ins.map(function(x){return'<div class="insight"><div class="ins-d" style="background:'+x.d+'"></div><div style="flex:1"><div class="ins-l" style="'+(x.c||'')+'">'+x.l+'</div><div class="ins-t">'+x.t+'</div>'+(x.s?'<div class="ins-s">'+x.s+'</div>':'')+'</div></div>';}).join('')+(ins.length===0?'<div style="text-align:center;padding:24px;color:var(--mut);font-size:12px">No issues detected.</div>':'');
+  }else if(t==='cache'){
+    var llm=nodes.filter(function(n){return n.isLLM;});
+    var cur=tot();var totalSav=0;
+    var rows=llm.filter(function(n){return n.sysTok>0;}).map(function(n){var prov=P[n.model].prov;var d=CACHE[prov];var sv=(n.sysTok*P[n.model].i/1e6)*d*n.calls;totalSav+=sv;return'<tr><td style="font-weight:500">'+n.name+'</td><td style="color:var(--mut)">'+n.sysTok+' tok × '+n.calls+'</td><td style="color:var(--mut)">'+Math.round(d*100)+'% disc</td><td style="color:var(--pur);font-weight:600">'+fmm(sv)+'/mo</td></tr>';}).join('');
+    sub.innerHTML='<div class="sec-t">Prompt caching savings</div><table class="tbl" style="margin-bottom:10px"><thead><tr><th>Node</th><th>Sys tokens</th><th>Discount</th><th>Saving</th></tr></thead><tbody>'+rows+'</tbody></table><div style="display:flex;justify-content:space-between;font-size:12px;font-weight:600"><span style="color:var(--mut)">Total savings:</span><span style="color:var(--pur)">'+fmm(totalSav)+'</span></div><div style="font-size:10px;color:var(--mut);margin-top:4px">With caching: <span style="color:var(--grn)">'+fmm(Math.max(0,cur-totalSav))+'</span>/mo</div>';
+  }
+}
+
+// ─── SETUP WIZARD ──────────────────────────────────────────────────────────────
+function openWizard(){
+  wizNodes=nodes.filter(function(n){return n.isLLM;});
+  wizStep=0;
+  document.getElementById('opt-panel').style.display='none';
+  document.getElementById('wiz-panel').style.display='block';
+  renderWizard();
+}
+function closeWizard(){document.getElementById('wiz-panel').style.display='none';}
+function renderWizard(){
+  if(!wizNodes.length)return;
+  var total=wizNodes.length+1;
+  var prog='';
+  for(var s=0;s<total;s++){
+    if(s>0)prog+='<div style="flex:1;height:1px;background:var(--bor)"></div>';
+    var cls=s<wizStep?'done':s===wizStep?'cur':'';
+    prog+='<div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;border:1px solid var(--bor);'+(cls==='done'?'background:var(--grn);color:#000;border-color:var(--grn)':cls==='cur'?'background:var(--amb);color:#000;border-color:var(--amb)':'background:var(--sur2);color:var(--mut)')+'">'+( cls==='done'?'✓':(s+1))+'</div>';
+  }
+  document.getElementById('wiz-prog').innerHTML=prog;
+  var body='',nav='';
+  if(wizStep<wizNodes.length){
+    var n=wizNodes[wizStep];
+    var ni=nodes.indexOf(n);
+    var lb=n.loopMult>1?'<div style="background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);border-radius:5px;padding:7px 10px;font-size:11px;color:var(--pur);margin-bottom:10px">Loop detected — estimated <strong>'+n.calls+' calls/month</strong> ('+n.baseCalls+' runs × '+n.loopMult+' items).</div>':'';
+    body='<div style="font-size:12px;font-weight:600;color:var(--txt);margin-bottom:3px">Node '+(wizStep+1)+'/'+wizNodes.length+': '+n.name+'</div><div style="font-size:11px;color:var(--mut);margin-bottom:10px">Upgrade from <span class="pill p-est">EST</span> to <span class="pill p-cal">CAL</span></div>'+lb+'<div class="grid2"><div class="field"><label>Calls per month</label><input type="number" id="wiz-calls" value="'+n.calls+'" min="1"></div><div class="field"><label>System prompt tokens</label><input type="number" id="wiz-sys" value="'+n.sysTok+'" min="0"></div></div><div class="field" style="margin-bottom:8px"><label>Input payload sample</label><textarea style="background:var(--sur);border:1px solid var(--bor);border-radius:5px;padding:8px;font-size:11px;color:var(--txt);font-family:inherit;width:100%;resize:vertical;outline:none;min-height:55px;line-height:1.4" id="wiz-in" placeholder=\'{"query":"mongolian yurt","clicks":12}\'>'+n.calText+'</textarea><div style="font-size:10px;color:var(--grn);margin-top:3px;min-height:14px" id="wiz-in-p">'+(n.calTok?'~'+n.calTok+' tokens':'')+'</div></div><div class="field" style="margin-bottom:4px"><label>Output sample <span style="color:var(--grn);font-weight:700">(paste real output for accurate out tok)</span></label><textarea style="background:var(--sur);border:1px solid rgba(16,185,129,.3);border-radius:5px;padding:8px;font-size:11px;color:var(--txt);font-family:inherit;width:100%;resize:vertical;outline:none;min-height:55px;line-height:1.4" id="wiz-out" placeholder=\'{"aeo_title":"...","meta_desc":"..."}\'>'+n.calOutText+'</textarea><div style="font-size:10px;color:var(--grn);margin-top:3px;min-height:14px" id="wiz-out-p">'+(n.calOutTok?'~'+n.calOutTok+' tokens — calibrated ✓':'')+'</div></div>';
+    nav='<button onclick="wizSkip()" style="'+GRN_BTN_DIM+'">Skip</button><button onclick="wizApply('+ni+')" style="margin-left:auto;'+GRN_BTN+'">Apply & next</button>';
+  }else{
+    var cal=wizNodes.filter(function(n){return n.accuracy==='cal'||n.accuracy==='ver';}).length;
+    body='<div style="font-size:12px;font-weight:600;color:var(--txt);margin-bottom:6px">Setup complete</div><div style="font-size:11px;color:var(--mut);margin-bottom:12px">'+cal+'/'+wizNodes.length+' nodes calibrated.</div><div style="font-size:22px;font-weight:700;color:var(--amb)">'+fmm(tot())+'/month</div>';
+    nav='<button onclick="closeWizard();switchN8nTab(\'compare\')" style="'+GRN_BTN+'">View compare</button><button onclick="closeWizard();switchN8nTab(\'insights\')" style="'+GRN_BTN_DIM+'">Insights</button>';
+  }
+  document.getElementById('wiz-body').innerHTML=body;
+  document.getElementById('wiz-nav').innerHTML=nav;
+  var wi=document.getElementById('wiz-in');var wo=document.getElementById('wiz-out');
+  if(wi)wi.addEventListener('input',function(){var el=document.getElementById('wiz-in-p');if(el)el.textContent='~'+c2t(this.value.length)+' tokens';});
+  if(wo)wo.addEventListener('input',function(){var el=document.getElementById('wiz-out-p');if(el)el.textContent='~'+c2t(this.value.length)+' tokens';});
+}
+function wizApply(ni){
+  var n=nodes[ni];
+  var calls=parseInt((document.getElementById('wiz-calls')||{}).value)||n.calls;
+  var sys=parseInt((document.getElementById('wiz-sys')||{}).value)||n.sysTok;
+  var inT=((document.getElementById('wiz-in')||{}).value||'').trim();
+  var outT=((document.getElementById('wiz-out')||{}).value||'').trim();
+  n.calls=calls;n.sysTok=sys;
+  if(inT){n.calText=inT;n.calTok=c2t(inT.length);n.inTok=sys+n.calTok;}
+  if(outT){n.calOutText=outT;n.calOutTok=c2t(outT.length);n.outTok=n.calOutTok;n.outCalibrated=true;}
+  n.accuracy='cal';wizStep++;renderWizard();renderN8nAll();
+}
+function wizSkip(){wizStep++;renderWizard();}
+
+// ─── OPTIMIZE WORKFLOW ─────────────────────────────────────────────────────────
+function openOptimize(){
+  document.getElementById('wiz-panel').style.display='none';
+  document.getElementById('opt-panel').style.display='block';
+  renderOptimize();
+}
+function closeOptimize(){document.getElementById('opt-panel').style.display='none';}
+function renderOptimize(){
+  var llm=nodes.filter(function(n){return n.isLLM;});
+  var recs=[];
+  var MONTHLY=tot();
+
+  // ── COST OPTIMIZATIONS ──
+  // 1. Prompt caching eligibility
+  var cacheNodes=llm.filter(function(n){return n.sysStatic&&n.sysTok>100;});
+  if(cacheNodes.length>0){
+    var cacheSav=cacheNodes.reduce(function(s,n){var d=CACHE[P[n.model].prov];return s+(n.sysTok*P[n.model].i/1e6)*d*n.calls;},0);
+    recs.push({cat:'cost',catLabel:'Cost',catColor:'#f59e0b',title:'Prompt caching eligible',desc:cacheNodes.length+' node'+(cacheNodes.length>1?'s have':'  has')+' static system prompts over 100 tokens. Anthropic caches at 90% off; OpenAI at 50% automatically for prompts >1,024 tokens.',saving:cacheSav>0?'Est. saving: '+fmm(cacheSav)+'/mo':'',how:'<strong>Anthropic:</strong> Add <code>cache_control: {type: "ephemeral"}</code> to the system message in your API call. <strong>OpenAI:</strong> Automatic for prompts >1,024 tokens — no code change needed.'});
+  }
+  // 2. Model right-sizing
+  llm.filter(function(n){return n.model==='opus'&&n.outTok<400;}).forEach(function(n){
+    var sav=mc(n,'opus')-mc(n,'sonnet');
+    recs.push({cat:'cost',catLabel:'Cost',catColor:'#f59e0b',title:'Model right-sizing: '+n.name,desc:'"'+n.name+'" uses Opus but produces short outputs ('+n.outTok+' tokens). Opus is best for complex reasoning with long outputs. For short structured outputs, Sonnet delivers equivalent quality at a fraction of the cost.',saving:'Switching to Sonnet saves '+fmm(sav)+'/mo on this node.',how:'In the n8n node settings, change the model from Opus to Claude Sonnet 4.6. Run 5–10 test executions to verify output quality before committing.'});
+  });
+  // 3. Dynamic payload trimming
+  llm.filter(function(n){return n.hasDynamic;}).forEach(function(n){
+    recs.push({cat:'cost',catLabel:'Cost',catColor:'#f59e0b',title:'Dynamic payload trimming: '+n.name,desc:'"'+n.name+'" sends dynamic payload data (JSON.stringify or $json expression). If your data object has more fields than the model needs, you are sending unnecessary tokens every call.',saving:'Trimming a 10-field object to 4 needed fields can cut input tokens by 30–60%.',how:'In your n8n Set node before this LLM node, explicitly select only the fields you need: <code>{{ {query: $json.query, clicks: $json.clicks} }}</code> instead of <code>{{ JSON.stringify($json) }}</code>.'});
+  });
+  // 4. Missing maxTokens
+  llm.filter(function(n){
+    var hasMax=false;
+    try{hasMax=!!(n.nodeRaw&&n.nodeRaw.parameters&&(n.nodeRaw.parameters.maxTokensToSample||n.nodeRaw.parameters.maxTokens||n.nodeRaw.parameters.max_tokens));}catch(e){}
+    return !hasMax;
+  }).forEach(function(n){
+    recs.push({cat:'cost',catLabel:'Cost',catColor:'#f59e0b',title:'Missing maxTokens: '+n.name,desc:'"'+n.name+'" has no maxTokens limit set. Without a ceiling, the model can generate long responses that drive unpredictable cost — especially in loops.',saving:'Setting maxTokens = 500 instead of unlimited can prevent 3–10× cost spikes.',how:'In the n8n LLM node options, set Max Tokens to a value appropriate for your expected output. For JSON responses, 400–600 is usually sufficient.'});
+  });
+
+  // ── RELIABILITY OPTIMIZATIONS ──
+  // 5. Missing Wait node in loops
+  var loopLLM=llm.filter(function(n){return n.loopMult>1;});
+  if(loopLLM.length>0){
+    var hasWait=nodes.some(function(n){return(n.nodeType||'').toLowerCase().indexOf('wait')>-1;});
+    if(!hasWait){
+      recs.push({cat:'reliability',catLabel:'Reliability',catColor:'#3b82f6',title:'Missing Wait node in loop',desc:loopLLM.length+' LLM node'+(loopLLM.length>1?'s are':'  is')+' inside a loop without a Wait node. At high batch volumes, rapid sequential API calls trigger rate limit errors (HTTP 429), causing the loop to fail silently.',saving:'',how:'Add a Wait node after your LLM node inside the loop. Set it to 0.5–1 second for Anthropic, 0.3–0.5 seconds for OpenAI. Connect: LLM → Wait → next node in loop.'});
+    }
+  }
+  // 6. Missing Error Trigger
+  var hasErrorTrigger=nodes.some(function(n){return(n.nodeType||'').toLowerCase().indexOf('errortrigger')>-1||(n.nodeType||'').toLowerCase().indexOf('error-trigger')>-1;});
+  if(!hasErrorTrigger){
+    recs.push({cat:'reliability',catLabel:'Reliability',catColor:'#3b82f6',title:'Missing Error Trigger node',desc:'No Error Trigger node detected. If any node in this workflow fails — including API timeouts or 429 errors — the failure will be silent. You won\'t know unless you manually check Executions.',saving:'',how:'Add an Error Trigger node. Connect it to a Slack or email notification node. Configure: Settings → Error Workflow → select a workflow that sends you an alert.'});
+  }
+  // 7. Retry on fail
+  llm.forEach(function(n){
+    var hasRetry=false;
+    try{hasRetry=!!(n.nodeRaw&&n.nodeRaw.retryOnFail);}catch(e){}
+    if(!hasRetry){
+      recs.push({cat:'reliability',catLabel:'Reliability',catColor:'#3b82f6',title:'Retry on Fail not set: '+n.name,desc:'"'+n.name+'" has Retry on Fail disabled. LLM APIs return transient 500 and 429 errors regularly. Without retry, one bad API response stops your entire workflow — especially damaging in loops.',saving:'',how:'Click "'+n.name+'" → Settings tab → Enable "Retry On Fail" → set Max Tries to 2, Wait Between Tries to 1000ms.'});
+    }
+  });
+
+  // ── ARCHITECTURE OPTIMIZATIONS ──
+  // 8. Sequential independent LLM nodes
+  if(llm.length>1){
+    var independentLLM=llm.filter(function(n){return n.loopMult===1;});
+    if(independentLLM.length>1){
+      recs.push({cat:'architecture',catLabel:'Architecture',catColor:'#a78bfa',title:'Sequential LLM nodes — consider parallel execution',desc:independentLLM.length+' LLM nodes appear to run sequentially. If they don\'t depend on each other\'s output, running them in parallel via n8n\'s parallel execution can significantly reduce total wall-clock time.',saving:'Parallel execution reduces latency, not cost — but faster completion means loops finish before rate limit windows reset.',how:'Check if any of these nodes depend on another\'s output. For independent nodes, route them from a common trigger using separate branches rather than chaining them sequentially.'});
+    }
+  }
+
+  // Render
+  var body='';
+  if(!recs.length){
+    body='<div style="text-align:center;padding:24px;color:var(--grn);font-size:12px">✓ No optimization issues detected. Your workflow is well-structured.</div>';
+  }else{
+    var cats=['cost','reliability','architecture'];
+    var catMeta={cost:{label:'Cost Optimizations',color:'#f59e0b'},reliability:{label:'Reliability Optimizations',color:'#3b82f6'},architecture:{label:'Architecture Optimizations',color:'#a78bfa'}};
+    cats.forEach(function(cat){
+      var catRecs=recs.filter(function(r){return r.cat===cat;});
+      if(!catRecs.length)return;
+      body+='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:'+catMeta[cat].color+';margin-bottom:8px;margin-top:12px">'+catMeta[cat].label+' ('+catRecs.length+')</div>';
+      catRecs.forEach(function(r){
+        body+='<div class="opt-rec"><div class="opt-rec-hdr"><span style="font-size:11px;font-weight:600;color:var(--txt)">'+r.title+'</span></div><div style="font-size:11px;color:var(--mut);line-height:1.5;margin-bottom:6px">'+r.desc+'</div>'+(r.saving?'<div class="opt-saving">'+r.saving+'</div>':'')+'<div class="opt-how"><strong>How to implement:</strong> '+r.how+'</div></div>';
+      });
+    });
+  }
+  document.getElementById('opt-body').innerHTML=body;
+}
+
+// ─── DEMO LOADER ──────────────────────────────────────────────────────────────
+function loadDemo(type){
+  var b=function(o){return Object.assign({calText:'',calTok:0,calOutText:'',calOutTok:0,accuracy:'est',sysStatic:true,outCalibrated:false,loopMult:1,baseCalls:30,nodeRaw:{}},o);};
+  var demos={
+    aeo:{name:'AEO_GEO Recommendation Agent',nodes:[
+      b({name:'Execute trigger',isLLM:false,model:'haiku35',inTok:0,outTok:0,sysTok:0,calls:30,hasDynamic:false}),
+      b({name:'Set – Run Context',isLLM:false,model:'haiku35',inTok:0,outTok:0,sysTok:0,calls:30,hasDynamic:false}),
+      b({name:'Query search analytics',isLLM:false,model:'haiku35',inTok:0,outTok:0,sysTok:0,calls:30,hasDynamic:false}),
+      b({name:'Get New Opportunities',isLLM:false,model:'haiku35',inTok:0,outTok:0,sysTok:0,calls:30,hasDynamic:false}),
+      b({name:'Loop Over Items',isLLM:false,model:'haiku35',inTok:0,outTok:0,sysTok:0,calls:90,hasDynamic:false}),
+      b({name:'Message a model',isLLM:true,model:'gpt41mini',inTok:218,outTok:338,sysTok:54,calls:90,hasDynamic:true,loopMult:3,baseCalls:30}),
+      b({name:'Parse Model JSON',isLLM:false,model:'haiku35',inTok:0,outTok:0,sysTok:0,calls:90,hasDynamic:false}),
+      b({name:'Update row(s)',isLLM:false,model:'haiku35',inTok:0,outTok:0,sysTok:0,calls:90,hasDynamic:false}),
+      b({name:'Wait',isLLM:false,model:'haiku35',inTok:0,outTok:0,sysTok:0,calls:90,hasDynamic:false})
+    ]},
+    yurts:{name:'Mongolian Yurts 7-Agent',nodes:[
+      b({name:'SEO/AEO Content Agent',isLLM:true,model:'sonnet',inTok:850,outTok:1200,sysTok:320,calls:30,hasDynamic:true}),
+      b({name:'Ad Grant Monitor',isLLM:true,model:'haiku35',inTok:400,outTok:200,sysTok:180,calls:30,hasDynamic:true}),
+      b({name:'Analytics Digest',isLLM:true,model:'haiku35',inTok:600,outTok:400,sysTok:200,calls:30,hasDynamic:true}),
+      b({name:'Social Media Agent',isLLM:true,model:'sonnet',inTok:500,outTok:600,sysTok:220,calls:60,hasDynamic:true}),
+      b({name:'Email/Newsletter Agent',isLLM:true,model:'sonnet',inTok:700,outTok:900,sysTok:280,calls:4,hasDynamic:true}),
+      b({name:'Conversion QA',isLLM:true,model:'haiku35',inTok:350,outTok:150,sysTok:160,calls:30,hasDynamic:true}),
+      b({name:'Monday Aggregator',isLLM:true,model:'haiku35',inTok:800,outTok:500,sysTok:300,calls:4,hasDynamic:true}),
+      b({name:'WooCommerce Webhook',isLLM:false,model:'haiku35',inTok:0,outTok:0,sysTok:0,calls:120,hasDynamic:false})
+    ]},
+    saas:{name:'B2B SaaS Lead Flow',nodes:[
+      b({name:'Lead Enrichment',isLLM:true,model:'gpt4o',inTok:600,outTok:300,sysTok:180,calls:500,hasDynamic:true}),
+      b({name:'Outreach Personalizer',isLLM:true,model:'gpt4o',inTok:800,outTok:600,sysTok:220,calls:500,hasDynamic:true}),
+      b({name:'Intent Classifier',isLLM:true,model:'gpt41mini',inTok:250,outTok:80,sysTok:120,calls:500,hasDynamic:false}),
+      b({name:'Proposal Drafter',isLLM:true,model:'opus',inTok:1200,outTok:1800,sysTok:400,calls:50,hasDynamic:true}),
+      b({name:'HubSpot Sync',isLLM:false,model:'haiku35',inTok:0,outTok:0,sysTok:0,calls:500,hasDynamic:false})
+    ]}
+  };
+  var d=demos[type];
+  wfName=d.name;nodes=d.nodes;openCalIdx=-1;wizStep=0;
+  var wb=document.getElementById('wiz-btn');wb.style.display='inline-flex';wb.style.cssText+=';'+GRN_BTN;
+  var ob=document.getElementById('opt-btn');ob.style.display='inline-flex';ob.style.cssText+=';'+GRN_BTN;
+  document.getElementById('opt-panel').style.display='none';
+  document.getElementById('wiz-panel').style.display='none';
+  renderN8nAll();
+}
+
+// ─── MODE SWITCHER ────────────────────────────────────────────────────────────
+function switchMode(m){
+  ['n8n','api','code','plan'].forEach(function(id){
+    var btn=document.getElementById('mbtn-'+id);
+    if(btn){btn.style.background=id===m?'#10b981':'rgba(16,185,129,.2)';btn.style.color=id===m?'#000':'#6ee7b7';btn.style.borderColor=id===m?'#10b981':'rgba(16,185,129,.5)';}
+    var panel=document.getElementById('mode-'+id);
+    if(panel)panel.classList.toggle('on',id===m);
+  });
+  if(m==='api')initAPI();
+  if(m==='code')calcCC();
+  if(m==='plan')calcPlan();
+}
+
+// ─── API CALLS MODE ──────────────────────────────────────────────────────────
+var API_MODELS={ant:[['haiku35','Haiku 3.5'],['haiku45','Haiku 4.5'],['sonnet','Sonnet 4.6'],['opus','Opus 4.6']],oai:[['gpt4omini','GPT-4o mini'],['gpt41mini','GPT-4.1 mini'],['gpt4o','GPT-4o'],['gpt41','GPT-4.1']]};
+function initAPI(){updateApiModels();calcAPI();}
+function updateApiModels(){
+  var prov=document.getElementById('api-provider').value;
+  var sel=document.getElementById('api-model');
+  sel.innerHTML=API_MODELS[prov].map(function(m){return'<option value="'+m[0]+'">'+m[1]+'</option>';}).join('');
+  if(prov==='ant')sel.selectedIndex=2;
+  calcAPI();
+}
+function calcAPIFromText(){var txt=document.getElementById('api-sys-text').value.trim();if(txt){var tok=c2t(txt.length);document.getElementById('api-sys').value=Math.round(tok/W2T);}calcAPI();}
+function calcAPI(){
+  var model=document.getElementById('api-model').value;
+  var p=P[model];if(!p)return;
+  var sysTxt=document.getElementById('api-sys-text').value.trim();
+  var sysTok=sysTxt?c2t(sysTxt.length):w2t(parseInt(document.getElementById('api-sys').value)||0);
+  var userTok=w2t(parseInt(document.getElementById('api-user').value)||0);
+  var outTok=w2t(parseInt(document.getElementById('api-out').value)||0);
+  var calls=parseInt(document.getElementById('api-calls').value)||1;
+  var turns=parseInt(document.getElementById('api-turns').value)||1;
+  var inTok=sysTok+(userTok*turns);
+  var totalOut=outTok*turns;
+  var perCall=(inTok*p.i+totalOut*p.o)/1e6;
+  var monthly=perCall*calls;
+  document.getElementById('api-results').style.display='block';
+  document.getElementById('api-per-call').textContent=fm4(perCall);
+  document.getElementById('api-monthly').textContent=fmm(monthly);
+  document.getElementById('api-annual').textContent=fmm(monthly*12);
+  var rows=Object.keys(P).map(function(mk){var pp=P[mk];var pc=(inTok*pp.i+totalOut*pp.o)/1e6;var pm=pc*calls;var delta=pm-monthly;var sg=delta>=0?'+':'';return{mk:mk,pp:pp,pc:pc,pm:pm,delta:delta,sg:sg};}).sort(function(a,b){return a.pm-b.pm;});
+  document.getElementById('api-cmp-tbody').innerHTML=rows.map(function(r){var cur=r.mk===model;return'<tr style="'+(cur?'background:rgba(16,185,129,.06)':'')+'"><td style="font-weight:'+(cur?'700':'400')+'">'+r.pp.lbl+(cur?' ★':'')+'</td><td><span class="pill '+(r.pp.prov==='oai'?'p-oai':'p-ant')+'">'+(r.pp.prov==='oai'?'OpenAI':'Anthropic')+'</span></td><td style="font-family:monospace;font-size:11px">'+fm4(r.pc)+'</td><td style="font-weight:600;color:var(--amb)">'+fmm(r.pm)+'</td><td style="font-size:11px;color:'+(r.delta<0?'var(--grn)':r.delta===0?'var(--mut)':'var(--red)')+'">'+r.sg+fmm(r.delta)+'</td></tr>';}).join('');
+  var ins=[];
+  if(turns>1)ins.push({d:'var(--pur)',l:'context compounding',c:'color:var(--pur)',t:'Multi-turn conversations grow context each turn. At '+turns+' turns input tokens are ~'+turns+'× higher.'});
+  if(sysTok>500)ins.push({d:'var(--amb)',l:'system prompt size',c:'color:var(--amb)',t:'Your system prompt is '+sysTok+' tokens — repeats every call. Prompt caching can reduce this by 90%.'});
+  var cheapest=rows[0];
+  if(cheapest.mk!==model&&cheapest.pm<monthly*.5)ins.push({d:'var(--grn)',l:'cost opportunity',c:'color:var(--grn)',t:P[cheapest.mk].lbl+' would cost '+fmm(cheapest.pm)+'/mo vs current '+fmm(monthly)+'/mo.',s:'Saving: '+fmm(monthly-cheapest.pm)+'/mo'});
+  document.getElementById('api-insights').innerHTML=ins.length?'<div class="sec-t">Insights</div>'+ins.map(function(x){return'<div class="insight"><div class="ins-d" style="background:'+x.d+'"></div><div style="flex:1"><div class="ins-l" style="'+(x.c||'')+'">'+x.l+'</div><div class="ins-t">'+x.t+'</div>'+(x.s?'<div class="ins-s">'+x.s+'</div>':'')+'</div></div>';}).join(''):'';}
+
+// ─── CLAUDE CODE MODE ─────────────────────────────────────────────────────────
+var CTX_MULT={low:.6,med:1,high:1.6};
+function calcCC(){
+  var model=document.getElementById('cc-model').value;
+  var p=P[model];if(!p)return;
+  var sessions=parseInt(document.getElementById('cc-sessions').value)||1;
+  var files=parseInt(document.getElementById('cc-files').value)||0;
+  var iters=parseInt(document.getElementById('cc-iters').value)||1;
+  var tools=parseInt(document.getElementById('cc-tools').value)||0;
+  var lines=parseInt(document.getElementById('cc-lines').value)||0;
+  var ctx=CTX_MULT[document.getElementById('cc-ctx').value]||1;
+  var fileReadTok=files*200*6;
+  var iterInputTok=iters*(tools*150+300);
+  var toolResultTok=iters*tools*200;
+  var codeOutTok=Math.round(lines*5);
+  var reasoningTok=iters*400;
+  var baseIn=fileReadTok+iterInputTok+toolResultTok+reasoningTok;
+  var totalIn=Math.round(baseIn*ctx);
+  var totalOut=codeOutTok+iters*250;
+  var perSess=(totalIn*p.i+totalOut*p.o)/1e6;
+  var monthly=perSess*sessions;
+  document.getElementById('cc-results').style.display='block';
+  document.getElementById('cc-in-tok').textContent=totalIn.toLocaleString();
+  document.getElementById('cc-out-tok').textContent=totalOut.toLocaleString();
+  document.getElementById('cc-per-sess').textContent=fmm(perSess);
+  document.getElementById('cc-monthly').textContent=fmm(monthly);
+  document.getElementById('cc-breakdown').innerHTML='<div style="display:grid;grid-template-columns:1fr auto;gap:4px 16px"><span style="color:var(--mut)">File reads ('+files+' × ~200 lines)</span><span style="color:var(--blu)">'+fileReadTok.toLocaleString()+' tok</span><span style="color:var(--mut)">Iteration context ('+iters+' rounds)</span><span style="color:var(--blu)">'+iterInputTok.toLocaleString()+' tok</span><span style="color:var(--mut)">Tool call results</span><span style="color:var(--blu)">'+toolResultTok.toLocaleString()+' tok</span><span style="color:var(--mut)">Reasoning overhead</span><span style="color:var(--blu)">'+reasoningTok.toLocaleString()+' tok</span><span style="color:var(--mut);font-weight:600">Total input</span><span style="color:var(--pur);font-weight:700">'+totalIn.toLocaleString()+'</span><span style="color:var(--mut)">Code written (~'+lines+' lines)</span><span style="color:var(--grn)">'+codeOutTok.toLocaleString()+' tok</span><span style="color:var(--mut)">Explanations</span><span style="color:var(--grn)">'+(iters*250).toLocaleString()+' tok</span><span style="color:var(--mut);font-weight:600">Total output</span><span style="color:var(--grn);font-weight:700">'+totalOut.toLocaleString()+'</span></div>';
+  var models=[['haiku35','var(--grn)'],['sonnet','var(--amb)'],['opus','var(--red)']];
+  document.getElementById('cc-cmp-tbody').innerHTML=models.map(function(m){var pp=P[m[0]];var ps=(totalIn*pp.i+totalOut*pp.o)/1e6;var pm=ps*sessions;var cur=m[0]===model;return'<tr style="'+(cur?'background:rgba(16,185,129,.06)':'')+'"><td style="color:'+m[1]+';font-weight:'+(cur?700:400)+'">'+pp.lbl+(cur?' ★':'')+'</td><td style="color:'+m[1]+'">'+fmm(ps)+'</td><td style="color:var(--amb);font-weight:'+(cur?700:400)+'">'+fmm(pm)+'</td><td style="color:var(--mut)">'+fmm(pm*12)+'</td></tr>';}).join('');
+  var ins=[];
+  if(perSess>2)ins.push({d:'var(--red)',l:'high session cost',c:'color:var(--red)',t:'At '+fmm(perSess)+'/session this compounds fast. Break large tasks into smaller sessions.'});
+  if(files>10)ins.push({d:'var(--amb)',l:'file read overhead',c:'color:var(--amb)',t:files+' file reads = '+fileReadTok.toLocaleString()+' input tokens before coding. Use targeted reads.'});
+  ins.push({d:'var(--grn)',l:'subscription alternative',c:'color:var(--grn)',t:'Claude Code via Claude.ai uses your subscription allowance, not API tokens. Use Plan Advisor to compare.'});
+  document.getElementById('cc-insights').innerHTML='<div class="sec-t">Insights</div>'+ins.map(function(x){return'<div class="insight"><div class="ins-d" style="background:'+x.d+'"></div><div style="flex:1"><div class="ins-l" style="'+(x.c||'')+'">'+x.l+'</div><div class="ins-t">'+x.t+'</div></div></div>';}).join('');
+}
+
+// ─── PLAN ADVISOR MODE ────────────────────────────────────────────────────────
+function calcPlan(){
+  var msgs=parseInt(document.getElementById('plan-msgs').value)||20;
+  var model=document.getElementById('plan-model').value;
+  var team=parseInt(document.getElementById('plan-team').value)||1;
+  var features=document.getElementById('plan-features').value;
+  var code=document.getElementById('plan-code').value;
+  var score={free:0,pro:0,team:0,enterprise:0};
+  if(msgs>20)score.pro+=2;
+  if(msgs>50){score.pro+=2;score.team+=1;}
+  if(model==='opus'){score.pro+=2;score.team+=1;}
+  if(model==='mixed')score.pro+=1;
+  if(team>1){score.pro+=1;score.team+=3;}
+  if(team>15){score.team+=2;score.enterprise+=3;}
+  if(team>50)score.enterprise+=5;
+  if(features==='projects')score.pro+=2;
+  if(features==='api')score.pro+=1;
+  if(features==='enterprise')score.enterprise+=5;
+  if(code==='light')score.pro+=1;
+  if(code==='heavy'){score.pro+=2;score.team+=1;}
+  var plans=[
+    {id:'free',name:'Free',price:'$0',color:'var(--mut)',features:['Limited messages/day','Sonnet & Haiku only','Basic Projects','No API access','1 user'],limit:'Best for: casual personal use'},
+    {id:'pro',name:'Pro',price:'$20/mo',color:'var(--amb)',features:['Higher message limits','All models incl. Opus','Full Projects','Claude Code access','1 user'],limit:'Best for: power individual users'},
+    {id:'team',name:'Team',price:'$25/user/mo',color:'var(--blu)',features:['All Pro features','Multiple users','Shared Projects','Admin controls'],limit:'Best for: small teams 2–50'},
+    {id:'enterprise',name:'Enterprise',price:'Custom',color:'var(--pur)',features:['Unlimited usage','SSO / SAML','Audit logs','Dedicated support','SLA'],limit:'Best for: large orgs, compliance'}
+  ];
+  var maxScore=Math.max(score.free,score.pro,score.team,score.enterprise);
+  var recommended=maxScore===score.enterprise?'enterprise':maxScore===score.team?'team':maxScore===score.pro?'pro':'free';
+  if(msgs<=5&&team===1&&features==='basic'&&code==='no')recommended='free';
+  document.getElementById('plan-results').style.display='block';
+  document.getElementById('plan-cards').innerHTML=plans.map(function(pl){var isRec=pl.id===recommended;return'<div class="plan-card'+(isRec?' recommended':'')+'"><div class="plan-name" style="color:'+pl.color+'">'+pl.name+'</div>'+(isRec?'<div class="plan-badge">Recommended</div>':'')+'<div class="plan-price">'+pl.price+'</div><ul class="plan-feat">'+pl.features.map(function(f){return'<li>'+f+'</li>';}).join('')+'</ul><div style="font-size:10px;color:var(--mut);margin-top:8px;border-top:1px solid var(--bor);padding-top:6px">'+pl.limit+'</div></div>';}).join('');
+  var ins=[];
+  if(recommended==='free')ins.push({d:'var(--grn)',l:'free tier fits',c:'color:var(--grn)',t:'Your usage fits the free tier. Upgrade to Pro if you hit daily limits.'});
+  if(recommended==='pro'&&team>1)ins.push({d:'var(--amb)',l:'team consideration',c:'color:var(--amb)',t:'Pro is per-person. For multiple users, Team adds shared Projects and admin controls.'});
+  if(code==='heavy')ins.push({d:'var(--pur)',l:'claude code billing',c:'color:var(--pur)',t:'Heavy Claude Code via Claude.ai uses your message allowance. API billing may be cheaper — use Claude Code mode to compare.'});
+  if(features==='api')ins.push({d:'var(--blu)',l:'api is separate',c:'color:var(--blu)',t:'API access is billed per token separately from subscriptions. Use API Calls mode to estimate.'});
+  document.getElementById('plan-insights').innerHTML=ins.length?'<div class="sec-t">Insights</div>'+ins.map(function(x){return'<div class="insight"><div class="ins-d" style="background:'+x.d+'"></div><div style="flex:1"><div class="ins-l" style="'+(x.c||'')+'">'+x.l+'</div><div class="ins-t">'+x.t+'</div></div></div>';}).join(''):'';}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────────
+initAPI();calcCC();calcPlan();
+</script>
+</body>
+</html>
